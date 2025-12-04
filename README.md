@@ -1,1 +1,1 @@
-# Aivle_4th_MiniProject_Backend
+# 에이블 8기 4차 미니프로젝트 백엔드 입니다.
