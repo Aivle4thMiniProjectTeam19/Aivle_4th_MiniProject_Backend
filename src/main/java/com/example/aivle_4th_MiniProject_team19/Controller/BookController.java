@@ -34,8 +34,8 @@ public class BookController {
         return ApiResponse.of(bookId);
     }
 
-    // 도서 검색(목록)
-    @GetMapping
+    // 도서 목록
+//    @GetMapping
     public ApiResponse<List<BookListDto>> getBookList() {
         log.info("getBookList()");
 
@@ -43,6 +43,19 @@ public class BookController {
 
         return ApiResponse.of(bookList);
     }
+
+    // 도서 검색(목록)
+    @GetMapping
+    public ApiResponse<List<BookListDto>> searchBookList(@RequestParam(required = false) String title,
+                                                         @RequestParam(required = false) String author,
+                                                         @RequestParam(required = false) String category) {
+        log.info("searchBookList()");
+
+        List<BookListDto> bookList = bookService.searchBookList(title, author, category);
+
+        return ApiResponse.of(bookList);
+    }
+
 
     // 도서 상세
     @GetMapping("/{bookId}")
