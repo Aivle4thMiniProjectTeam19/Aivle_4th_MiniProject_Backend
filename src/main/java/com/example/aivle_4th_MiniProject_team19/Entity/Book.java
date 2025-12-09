@@ -40,10 +40,15 @@ public class Book extends BaseEntity {
     }
 
     // 비즈니스 로직
-    public void update(String title, String authorName, String category, String description) {
+    public void update(String title, String authorName, String category, String description, Image image) {
+        if (image == null) {
+            this.image = null;
+        }
+
         this.title = title;
         this.authorName = authorName;
         this.category = category;
         this.description = description;
+        this.image = image;
     }
 }

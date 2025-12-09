@@ -16,6 +16,7 @@ public class BookListDto {
     private String title;
     private String authorName;
     private String category;
+    private ImageDto image;
 
     // Entity -> Dto
     public static BookListDto from(Book book) {
@@ -24,6 +25,7 @@ public class BookListDto {
                 .title(book.getTitle())
                 .authorName(book.getAuthorName())
                 .category(book.getCategory())
+                .image(ImageDto.from(book.getImage()))
                 .build();
     }
 }

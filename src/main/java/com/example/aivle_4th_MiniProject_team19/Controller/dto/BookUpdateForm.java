@@ -22,6 +22,8 @@ public class BookUpdateForm {
     private String category;
     @NotNull
     private String description;
+    @NotNull
+    private String imageUrl;
 
     public Book toEntity() {
         return Book.builder()

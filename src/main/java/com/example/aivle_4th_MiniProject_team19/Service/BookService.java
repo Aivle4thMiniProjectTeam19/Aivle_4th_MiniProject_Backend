@@ -3,9 +3,11 @@ package com.example.aivle_4th_MiniProject_team19.Service;
 import com.example.aivle_4th_MiniProject_team19.Controller.dto.BookCreateForm;
 import com.example.aivle_4th_MiniProject_team19.Controller.dto.BookUpdateForm;
 import com.example.aivle_4th_MiniProject_team19.Entity.Book;
+import com.example.aivle_4th_MiniProject_team19.Entity.Image;
 import com.example.aivle_4th_MiniProject_team19.Entity.Member;
 import com.example.aivle_4th_MiniProject_team19.Exception.BookNotFoundException;
 import com.example.aivle_4th_MiniProject_team19.Repository.BookQueryRepository;
+import com.example.aivle_4th_MiniProject_team19.Repository.ImageRepository;
 import com.example.aivle_4th_MiniProject_team19.Repository.MemberRepository;
 import com.example.aivle_4th_MiniProject_team19.Repository.BookRepository;
 import com.example.aivle_4th_MiniProject_team19.Repository.dto.BookSearch;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 //import java.util.Optional;
@@ -31,10 +34,12 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookQueryRepository bookQueryRepository;
     private final MemberRepository memberRepository;
+    private final ImageService imageService;
+    private final ImageRepository imageRepository;
     private final JwtUtil jwtUtil;
     // 도서 등록
     @Transactional
-    public Long createBook(BookCreateForm bookCreateForm, String authHeder) {
+    public Long createBook(BookCreateForm bookCreateForm, String authHeder) throws IOException {
         // 토큰 추출
         String token = authHeder.replace("Bearer ", "");
         // username 꺼내기
@@ -43,9 +48,13 @@ public class BookService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Member not found: " + username));
 
+        Image image = imageService.saveImageFromUrl(bookCreateForm.getImageUrl());
+
         Book book = bookCreateForm.toEntity();
         // Member 연결
         book.setMember(member);
+        // Image 연결
+        book.setImage(image);
         log.info("bookCreateForm.toEntity() : {}, {}, {}", book.getId(), book.getAuthorName(), book.getDescription());
         Book savedBook = bookRepository.save(book);
         log.info("savedBook : {}, {}, {}", savedBook.getId(), savedBook.getAuthorName(), savedBook.getDescription());
@@ -92,7 +101,7 @@ public class BookService {
 
     // 도서 수정
     @Transactional
-    public Long updateBook(Long bookId, BookUpdateForm bookUpdateForm, String authHeader) {
+    public Long updateBook(Long bookId, BookUpdateForm bookUpdateForm, String authHeader) throws IOException {
         String token = authHeader.replace("Bearer ", "");
         String username = jwtUtil.getUsername(token);
 
@@ -103,8 +112,12 @@ public class BookService {
         if (!book.getMember().getUsername().equals(username)) {
             throw new RuntimeException("본인이 등록한 책만 수정할 수 있습니다.");
         }
+
+        Long imageId = book.getImage().getId();
+        Image image = imageService.updateImage(imageId, bookUpdateForm.getImageUrl());
+
         // 수정 (변경 감지)
-        book.update(bookUpdateForm.getTitle(), bookUpdateForm.getAuthorName(), bookUpdateForm.getCategory(), bookUpdateForm.getDescription());
+        book.update(bookUpdateForm.getTitle(), bookUpdateForm.getAuthorName(), bookUpdateForm.getCategory(), bookUpdateForm.getDescription(), image);
 
         return book.getId();
     }
