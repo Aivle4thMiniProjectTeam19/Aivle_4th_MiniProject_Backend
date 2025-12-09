@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 //import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class BookController {
 
     // 도서 등록
     @PostMapping
-    public ApiResponse<Long> createBook(@Valid @RequestBody BookCreateForm bookCreateForm){
+    public ApiResponse<Long> createBook(@Valid @RequestBody BookCreateForm bookCreateForm) throws IOException {
         //    , @RequestHeader("Authorization") String authHeader) {
         log.info("BookCreateForm : {}", bookCreateForm.toString());
 
@@ -70,7 +71,7 @@ public class BookController {
     // 도서 수정
     @PutMapping("/{bookId}")
     public ApiResponse<Long> updateBook(@PathVariable(name = "bookId") Long bookId,
-                                        @RequestBody BookUpdateForm bookUpdateForm){
+                                        @RequestBody BookUpdateForm bookUpdateForm) throws IOException {
             //, @RequestHeader("Authorization") String authHeader) {
         log.info("updateBook()");
 
